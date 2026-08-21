@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.use(authMiddleware.protect);
 
+router.post('/checkout-session', bookingController.getCheckoutSession);
 router.post('/', bookingController.createBooking);
 router.get('/my-bookings', bookingController.getMyBookings);
 

@@ -8,6 +8,7 @@ import HotelDetails from './pages/HotelDetails';
 import ProtectedRoute from './components/ProtectedRoute';
 import HostDashboard from './pages/HostDashboard';
 import MyBookings from './pages/MyBookings';
+import PaymentSuccess from './pages/PaymentSuccess';
 import EditHotel from './pages/EditHotel';
 
 const NotFound = () => <div className="p-8 text-center text-red-500 font-bold">404 - Page Not Found</div>;
@@ -43,6 +44,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <MyBookings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/success"
+                element={
+                  <ProtectedRoute>
+                    <PaymentSuccess />
                   </ProtectedRoute>
                 }
               />

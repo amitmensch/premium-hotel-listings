@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { FaMapMarkerAlt, FaCheck, FaArrowLeft } from 'react-icons/fa';
 import api from '../services/api';
 import Reviews from '../components/Reviews';
+import Map from '../components/Map';
 import { AuthContext } from '../context/AuthContext';
 
 const HotelDetails = () => {
@@ -45,22 +46,40 @@ const HotelDetails = () => {
 
   const handleBooking = async (e) => {
     e.preventDefault();
+    if (!checkIn || !checkOut) {
+      setBookingMessage({ type: 'error', text: 'Please select check-in and check-out dates.' });
+      return;
+    }
+
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
+    if (start >= end) {
+      setBookingMessage({ type: 'error', text: 'Check-out date must be after check-in date.' });
+      return;
+    }
+
+    const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+    const totalPrice = nights * hotel.pricePerNight;
+
     setBookingLoading(true);
     setBookingMessage({ type: '', text: '' });
 
     try {
-      await api.post('/bookings', {
+      // 1. Ask backend for a Stripe checkout session URL
+      const res = await api.post('/bookings/checkout-session', {
         hotelId: hotel._id,
-        checkIn,
-        checkOut
+        checkInDate: checkIn,
+        checkOutDate: checkOut,
+        totalPrice
       });
-      setBookingMessage({ type: 'success', text: 'Reservation confirmed successfully!' });
+
+      // 2. Redirect the user to Stripe's secure checkout page
+      window.location.href = res.data.sessionUrl;
     } catch (err) {
-      setBookingMessage({ 
-        type: 'error', 
-        text: err.response?.data?.message || 'Failed to complete booking.' 
+      setBookingMessage({
+        type: 'error',
+        text: err.response?.data?.message || 'Failed to initialize checkout.'
       });
-    } finally {
       setBookingLoading(false);
     }
   };
@@ -157,6 +176,12 @@ const HotelDetails = () => {
             
             <div className="mt-8 text-sm text-gray-500 border-t border-gray-100 pt-6">
               Listed by: <span className="font-medium text-gray-900">{hotel.host?.name || 'Unknown Host'}</span>
+            </div>
+
+            {/* NEW: Map Section */}
+            <div className="mt-10 border-t border-gray-100 pt-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Where you'll be</h2>
+              <Map location={`${hotel.location.city}, ${hotel.location.country}`} name={hotel.name} />
             </div>
 
             <Reviews hotelId={hotel._id} />
