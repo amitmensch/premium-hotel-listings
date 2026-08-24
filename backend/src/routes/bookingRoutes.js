@@ -10,4 +10,7 @@ router.post('/checkout-session', bookingController.getCheckoutSession);
 router.post('/', bookingController.createBooking);
 router.get('/my-bookings', bookingController.getMyBookings);
 
+// Cancel a booking (must be the owner)
+router.delete('/:id', authMiddleware.protect, bookingController.cancelBooking);
+
 module.exports = router;

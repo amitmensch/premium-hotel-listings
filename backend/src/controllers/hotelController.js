@@ -3,8 +3,9 @@ const AppError = require('../utils/AppError');
 const catchAsync = require('../utils/catchAsync');
 
 exports.getAllHotels = catchAsync(async (req, res, next) => {
+  // 1) Filtering logic
   const { destination, minPrice, maxPrice } = req.query;
-  
+
   let query = {};
 
   if (destination) {
@@ -23,12 +24,33 @@ exports.getAllHotels = catchAsync(async (req, res, next) => {
     if (maxPrice) query.pricePerNight.$lte = Number(maxPrice);
   }
 
-  const hotels = await Hotel.find(query).populate('host', 'name email');
+  // 2) Pagination Parameters
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 6; // Default 6 hotels per page
+  const skip = (page - 1) * limit;
+
+  // Count total documents matching the query for pagination metadata
+  const totalHotels = await Hotel.countDocuments(query);
+  const totalPages = Math.ceil(totalHotels / limit);
+
+  // Apply skip and limit to the query
+  const hotels = await Hotel.find(query)
+    .populate('host', 'name email')
+    .skip(skip)
+    .limit(limit);
 
   res.status(200).json({
     status: 'success',
     results: hotels.length,
-    data: { hotels }
+    pagination: {
+      currentPage: page,
+      totalPages,
+      totalHotels,
+      limit
+    },
+    data: {
+      hotels
+    }
   });
 });
 

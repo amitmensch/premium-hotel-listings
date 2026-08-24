@@ -106,3 +106,23 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     sessionUrl: session.url
   });
 });
+
+exports.cancelBooking = catchAsync(async (req, res, next) => {
+  const booking = await Booking.findById(req.params.id);
+
+  if (!booking) {
+    return next(new AppError('No booking found with that ID', 404));
+  }
+
+  // Ensure only the user who made the booking can cancel it
+  if (booking.user.toString() !== req.user.id) {
+    return next(new AppError('You can only cancel your own bookings', 403));
+  }
+
+  await booking.deleteOne();
+
+  res.status(204).json({
+    status: 'success',
+    data: null
+  });
+});

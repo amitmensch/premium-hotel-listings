@@ -7,6 +7,7 @@ const authRoutes = require('./routes/authRoutes');
 const hotelRoutes = require('./routes/hotelRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.get('/api/health', (req, res) => {
 
 // MOUNT ROUTES HERE
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/hotels/:hotelId/reviews', reviewRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/hotels', hotelRoutes);

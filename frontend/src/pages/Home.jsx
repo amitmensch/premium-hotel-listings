@@ -10,13 +10,18 @@ const Home = () => {
 
   const [destination, setDestination] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const fetchHotels = async (searchQuery = '') => {
+  const fetchHotels = async (searchQuery = '', page = 1) => {
     setLoading(true);
     setError('');
     try {
-      const res = await api.get(`/hotels${searchQuery}`);
+      const separator = searchQuery.startsWith('?') ? '&' : (searchQuery ? '&' : '?');
+      const res = await api.get(`/hotels${searchQuery}${separator}page=${page}&limit=6`);
       setHotels(res.data.data.hotels);
+      setTotalPages(res.data.pagination.totalPages);
+      setCurrentPage(res.data.pagination.currentPage);
     } catch (err) {
       setError('Failed to load properties. Please try again later.');
     } finally {
@@ -25,23 +30,25 @@ const Home = () => {
   };
 
   useEffect(() => {
-    fetchHotels();
-  }, []);
+    fetchHotels('', currentPage);
+  }, [currentPage]);
 
   const handleSearch = (e) => {
     e.preventDefault();
     let queryParams = [];
     if (destination) queryParams.push(`destination=${destination}`);
     if (maxPrice) queryParams.push(`maxPrice=${maxPrice}`);
-    
+
     const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}` : '';
-    fetchHotels(queryString);
+    setCurrentPage(1);
+    fetchHotels(queryString, 1);
   };
 
   const clearSearch = () => {
     setDestination('');
     setMaxPrice('');
-    fetchHotels();
+    setCurrentPage(1);
+    fetchHotels('', 1);
   };
 
   return (
@@ -106,11 +113,38 @@ const Home = () => {
           <button onClick={clearSearch} className="mt-4 text-blue-600 font-medium hover:underline">Clear filters</button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {hotels.map((hotel) => (
-            <HotelCard key={hotel._id} hotel={hotel} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {hotels.map((hotel) => (
+              <HotelCard key={hotel._id} hotel={hotel} />
+            ))}
+          </div>
+
+          {/* Pagination UI Controls */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-4 mt-12 mb-8">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Previous
+              </button>
+
+              <span className="text-sm font-medium text-gray-600">
+                Page {currentPage} of {totalPages}
+              </span>
+
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

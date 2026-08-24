@@ -29,6 +29,18 @@ const MyBookings = () => {
     });
   };
 
+  const handleCancelBooking = async (bookingId) => {
+    if (window.confirm('Are you sure you want to cancel this reservation? This cannot be undone.')) {
+      try {
+        await api.delete(`/bookings/${bookingId}`);
+        // Remove the deleted booking from the local state so the UI updates instantly
+        setBookings(bookings.filter(b => b._id !== bookingId));
+      } catch (err) {
+        alert('Failed to cancel booking.');
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
@@ -105,16 +117,24 @@ const MyBookings = () => {
                   </div>
 
                   <div className="flex justify-between items-end border-t border-gray-100 pt-4 mt-2">
-                    <div>
-                      <span className="block text-sm text-gray-500">Total Price</span>
-                      <span className="text-2xl font-extrabold text-blue-600">${booking.totalPrice}</span>
-                    </div>
-                    {hotel && (
-                      <Link to={`/hotels/${hotel._id}`} className="text-sm font-medium text-blue-600 hover:text-blue-800">
-                        View Property
-                      </Link>
-                    )}
-                  </div>
+                     <div>
+                       <span className="block text-sm text-gray-500">Total Price</span>
+                       <span className="text-2xl font-extrabold text-blue-600">${booking.totalPrice}</span>
+                     </div>
+                     <div className="flex gap-4 items-center">
+                       <button
+                         onClick={() => handleCancelBooking(booking._id)}
+                         className="text-sm font-medium text-red-500 hover:text-red-700 transition-colors"
+                       >
+                         Cancel Trip
+                       </button>
+                       {hotel && (
+                         <Link to={`/hotels/${hotel._id}`} className="text-sm font-medium text-blue-600 hover:text-blue-800">
+                           View Property
+                         </Link>
+                       )}
+                     </div>
+                   </div>
                 </div>
               </div>
             );

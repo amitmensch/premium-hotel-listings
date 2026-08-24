@@ -34,8 +34,14 @@ const Navbar = () => {
               user ? (
                 <>
                   <span className="text-sm font-medium text-gray-500 hidden sm:block">
-                    Hello, {user.name}
+                    Hello,
                   </span>
+                  <Link
+                    to="/profile"
+                    className="text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors hidden sm:inline"
+                  >
+                    {user.name}
+                  </Link>
 
                   <Link 
                     to="/my-bookings" 
