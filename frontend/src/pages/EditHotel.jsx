@@ -8,10 +8,8 @@ const EditHotel = () => {
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
   const [error, setError] = useState('');
-  
-  const [formData, setFormData] = useState({
-    name: '', description: '', pricePerNight: '', amenities: ''
-  });
+
+  const [formData, setFormData] = useState({ name: '', description: '', pricePerNight: '', amenities: '' });
 
   useEffect(() => {
     const fetchHotel = async () => {
@@ -22,7 +20,7 @@ const EditHotel = () => {
           name: hotel.name,
           description: hotel.description,
           pricePerNight: hotel.pricePerNight,
-          amenities: hotel.amenities.join(', ')
+          amenities: hotel.amenities.join(', '),
         });
       } catch (err) {
         setError('Could not load property details.');
@@ -33,22 +31,18 @@ const EditHotel = () => {
     fetchHotel();
   }, [id]);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     const updatedData = {
       name: formData.name,
       description: formData.description,
       pricePerNight: Number(formData.pricePerNight),
-      amenities: formData.amenities.split(',').map(item => item.trim())
+      amenities: formData.amenities.split(',').map((s) => s.trim()),
     };
-
     try {
       await api.patch(`/hotels/${id}`, updatedData);
       navigate(`/hotels/${id}`);
@@ -58,33 +52,50 @@ const EditHotel = () => {
     }
   };
 
-  if (initialLoad) return <div className="text-center py-20">Loading...</div>;
+  if (initialLoad) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-ink-200 border-t-ink-800" />
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12">
-      <h1 className="text-3xl font-extrabold mb-6">Edit Property</h1>
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        {error && <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-lg">{error}</div>}
+    <div className="container-page mx-auto max-w-3xl py-12 lg:py-16">
+      <p className="eyebrow">Host dashboard</p>
+      <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight text-ink-900">
+        Edit property
+      </h1>
+
+      <div className="card mt-10 p-6 sm:p-8">
+        {error && (
+          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Property Name</label>
-            <input type="text" name="name" value={formData.name} required onChange={handleChange} className="mt-1 block w-full px-4 py-2 border rounded-lg" />
+            <label className="label">Property name</label>
+            <input type="text" name="name" value={formData.name} required onChange={handleChange} className="input" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Description</label>
-            <textarea name="description" rows="4" value={formData.description} required onChange={handleChange} className="mt-1 block w-full px-4 py-2 border rounded-lg"></textarea>
+            <label className="label">Description</label>
+            <textarea name="description" rows="4" value={formData.description} required onChange={handleChange} className="input" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Price per Night (USD)</label>
-            <input type="number" name="pricePerNight" value={formData.pricePerNight} required onChange={handleChange} className="mt-1 block w-full px-4 py-2 border rounded-lg" />
+            <label className="label">Price per night (USD)</label>
+            <input type="number" name="pricePerNight" min="1" value={formData.pricePerNight} required onChange={handleChange} className="input" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Amenities (comma separated)</label>
-            <input type="text" name="amenities" value={formData.amenities} required onChange={handleChange} className="mt-1 block w-full px-4 py-2 border rounded-lg" />
+            <label className="label">Amenities (comma separated)</label>
+            <input type="text" name="amenities" value={formData.amenities} required onChange={handleChange} className="input" />
           </div>
-          <button type="submit" disabled={loading} className="px-8 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 disabled:opacity-70">
-            {loading ? 'Saving...' : 'Save Changes'}
-          </button>
+          <div className="flex justify-end border-t border-ink-100 pt-6">
+            <button type="submit" disabled={loading} className="btn-primary">
+              {loading ? 'Saving…' : 'Save changes'}
+            </button>
+          </div>
         </form>
       </div>
     </div>

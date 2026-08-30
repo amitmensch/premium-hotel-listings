@@ -43,15 +43,15 @@ const Map = ({ location, name }) => {
 
   if (loading) {
     return (
-      <div className="h-[400px] w-full bg-gray-100 animate-pulse rounded-xl flex items-center justify-center text-gray-500 font-medium">
-        Loading map...
+      <div className="flex h-[400px] w-full animate-pulse items-center justify-center rounded-xl bg-ink-100 text-sm font-medium text-ink-400">
+        Loading map…
       </div>
     );
   }
 
   if (!position) {
     return (
-      <div className="h-[400px] w-full bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-center text-gray-500">
+      <div className="flex h-[400px] w-full items-center justify-center rounded-xl border border-ink-100 bg-white text-sm text-ink-400">
         Map unavailable for this location.
       </div>
     );
@@ -70,7 +70,7 @@ const Map = ({ location, name }) => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <Marker position={position}>
-          <Popup className="font-bold">
+          <Popup className="font-serif font-semibold">
             {name}
           </Popup>
         </Marker>

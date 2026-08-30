@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
+import { Link } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa';
 import { AuthContext } from '../context/AuthContext';
 import api from '../services/api';
@@ -29,12 +30,12 @@ const Reviews = ({ hotelId }) => {
     try {
       await api.post(`/hotels/${hotelId}/reviews`, {
         rating: Number(rating),
-        review: reviewText
+        review: reviewText,
       });
       setReviewText('');
       fetchReviews();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to post review');
+      setError(err.response?.data?.message || 'Failed to post review.');
     }
   };
 
@@ -44,28 +45,30 @@ const Reviews = ({ hotelId }) => {
         await api.delete(`/reviews/${reviewId}`);
         fetchReviews();
       } catch (err) {
-        alert('Failed to delete review');
+        alert('Failed to delete review.');
       }
     }
   };
 
   return (
-    <div className="mt-10 border-t border-gray-100 pt-8">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Guest Reviews</h2>
+    <section>
+      <h2 className="font-serif text-2xl font-semibold text-ink-900">Guest reviews</h2>
 
       {user ? (
-        <form onSubmit={handleSubmit} className="mb-8 bg-gray-50 p-4 rounded-xl border border-gray-200">
-          <h3 className="font-bold text-gray-800 mb-2">Leave a Review</h3>
-          {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-sm font-medium text-gray-700">Rating:</span>
-            <select 
-              value={rating} 
+        <form onSubmit={handleSubmit} className="card mt-6 p-6">
+          <h3 className="text-sm font-semibold text-ink-900">Leave a review</h3>
+          {error && (
+            <p className="mt-3 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
+          )}
+          <div className="mt-4 flex items-center gap-4">
+            <label className="label !mb-0">Rating</label>
+            <select
+              value={rating}
               onChange={(e) => setRating(e.target.value)}
-              className="border border-gray-300 rounded px-2 py-1 text-sm bg-white"
+              className="input !w-auto"
             >
               {[5, 4, 3, 2, 1].map((num) => (
-                <option key={num} value={num}>{num} Stars</option>
+                <option key={num} value={num}>{num} stars</option>
               ))}
             </select>
           </div>
@@ -75,45 +78,59 @@ const Reviews = ({ hotelId }) => {
             placeholder="How was your stay?"
             value={reviewText}
             onChange={(e) => setReviewText(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg text-sm mb-3"
-          ></textarea>
-          <button type="submit" className="bg-blue-600 text-white font-bold px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
-            Submit Review
-          </button>
+            className="input mt-4"
+          />
+          <div className="mt-4">
+            <button type="submit" className="btn-primary !px-5 !py-2.5">Submit review</button>
+          </div>
         </form>
       ) : (
-        <p className="text-sm text-gray-500 mb-6">Please log in to leave a review.</p>
+        <p className="mt-4 text-sm text-ink-500">
+          <Link
+            to="/login"
+            className="font-medium text-ink-900 underline decoration-brand-400 decoration-2 underline-offset-4 hover:text-brand-600"
+          >
+            Log in
+          </Link>{' '}
+          to leave a review.
+        </p>
       )}
 
-      <div className="space-y-4">
+      <div className="mt-8 divide-y divide-ink-100">
         {reviews.length === 0 ? (
-          <p className="text-gray-500 text-sm">No reviews yet. Be the first to leave one!</p>
+          <p className="py-4 text-sm text-ink-500">No reviews yet. Be the first to leave one.</p>
         ) : (
           reviews.map((item) => (
-            <div key={item._id} className="p-4 bg-white rounded-lg border border-gray-100 shadow-sm">
-              <div className="flex justify-between items-center mb-1">
-                <div className="flex items-center gap-4">
-                  <span className="font-bold text-gray-900">{item.user?.name || 'Anonymous'}</span>
-                  {user && item.user && user._id === item.user._id && (
-                    <button 
-                      onClick={() => handleDelete(item._id)}
-                      className="text-xs text-red-500 hover:text-red-700 font-medium"
-                    >
-                      Delete
-                    </button>
-                  )}
+            <div key={item._id} className="py-6 first:pt-0">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-ink-900 text-xs font-semibold text-white">
+                    {(item.user?.name || 'A').charAt(0).toUpperCase()}
+                  </span>
+                  <div>
+                    <p className="text-sm font-semibold text-ink-900">
+                      {item.user?.name || 'Anonymous'}
+                    </p>
+                    {user && item.user && user._id === item.user._id && (
+                      <button
+                        onClick={() => handleDelete(item._id)}
+                        className="text-xs font-medium text-red-500 transition-colors hover:text-red-700"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center text-yellow-400">
-                  <FaStar className="mr-1" />
-                  <span className="font-bold text-gray-700 text-sm">{item.rating}</span>
-                </div>
+                <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-ink-50 px-3 py-1 text-sm font-medium text-ink-800">
+                  <FaStar className="text-amber-400" /> {item.rating}
+                </span>
               </div>
-              <p className="text-gray-600 text-sm mt-1">{item.review}</p>
+              <p className="mt-3 text-sm leading-relaxed text-ink-600">{item.review}</p>
             </div>
           ))
         )}
       </div>
-    </div>
+    </section>
   );
 };
 

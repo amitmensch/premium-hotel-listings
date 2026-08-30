@@ -8,9 +8,7 @@ const Register = () => {
   const { register } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,69 +22,60 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-extrabold text-gray-900">Create an account</h2>
-          <p className="mt-2 text-sm text-gray-600">Join PremiumStays today</p>
-        </div>
+    <div className="container-page flex min-h-[70vh] items-center justify-center py-16">
+      <div className="card w-full max-w-md p-8 sm:p-10">
+        <p className="eyebrow">Join PremiumStays</p>
+        <h1 className="mt-3 font-serif text-4xl font-semibold text-ink-900">Create account</h1>
+        <p className="mt-2 text-sm text-ink-500">Start booking or hosting premium stays.</p>
 
-        {error && <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg">{error}</div>}
+        {error && (
+          <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="mt-8 space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Full Name</label>
-            <input
-              type="text"
-              name="name"
-              required
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-              onChange={handleChange}
-            />
+            <label htmlFor="name" className="label">Full name</label>
+            <input id="name" type="text" name="name" required onChange={handleChange} className="input" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email address</label>
-            <input
-              type="email"
-              name="email"
-              required
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-              onChange={handleChange}
-            />
+            <label htmlFor="reg-email" className="label">Email address</label>
+            <input id="reg-email" type="email" name="email" required onChange={handleChange} className="input" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Password (Min 8 chars)</label>
+            <label htmlFor="reg-password" className="label">
+              Password <span className="normal-case tracking-normal text-ink-400">(min 8 characters)</span>
+            </label>
             <input
+              id="reg-password"
               type="password"
               name="password"
               required
               minLength="8"
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
               onChange={handleChange}
+              className="input"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">I want to...</label>
-            <select
-              name="role"
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
-              onChange={handleChange}
-            >
+            <label htmlFor="role" className="label">I want to…</label>
+            <select id="role" name="role" onChange={handleChange} className="input">
               <option value="user">Book stays (Guest)</option>
               <option value="host">List my properties (Host)</option>
             </select>
           </div>
-          <button
-            type="submit"
-            className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
-          >
-            Sign up
-          </button>
+          <button type="submit" className="btn-primary w-full">Sign up</button>
         </form>
-        <div className="mt-6 text-center text-sm">
-          <span className="text-gray-600">Already have an account? </span>
-          <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">Log in</Link>
-        </div>
+
+        <p className="mt-6 text-center text-sm text-ink-500">
+          Already have an account?{' '}
+          <Link
+            to="/login"
+            className="font-medium text-ink-900 underline decoration-brand-400 decoration-2 underline-offset-4 transition-colors hover:text-brand-600"
+          >
+            Log in
+          </Link>
+        </p>
       </div>
     </div>
   );

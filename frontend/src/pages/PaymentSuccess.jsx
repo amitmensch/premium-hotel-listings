@@ -1,13 +1,12 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { FaCheck } from 'react-icons/fa';
 import api from '../services/api';
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [status, setStatus] = useState('Processing your booking...');
-  
-  // Use a ref to prevent React StrictMode from double-booking
+  const [status, setStatus] = useState('Processing your booking…');
   const hasBooked = useRef(false);
 
   useEffect(() => {
@@ -20,17 +19,15 @@ const PaymentSuccess = () => {
         hotelId: params.get('hotelId'),
         checkIn: params.get('checkIn'),
         checkOut: params.get('checkOut'),
-        totalPrice: Number(params.get('price'))
+        totalPrice: Number(params.get('price')),
       };
 
       try {
         await api.post('/bookings', bookingData);
-        setStatus('Payment successful! Booking confirmed.');
-        setTimeout(() => {
-          navigate('/my-bookings');
-        }, 3000);
+        setStatus("Booking confirmed. We'll see you soon.");
+        setTimeout(() => navigate('/my-bookings'), 3000);
       } catch (err) {
-        setStatus('Payment verified, but booking failed to save. Please contact support.');
+        setStatus('Payment verified, but the booking could not be saved. Please contact support.');
       }
     };
 
@@ -38,16 +35,14 @@ const PaymentSuccess = () => {
   }, [location, navigate]);
 
   return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
-      <div className="bg-white p-10 rounded-2xl shadow-lg border border-gray-100 max-w-md w-full">
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
-          </svg>
+    <div className="container-page flex min-h-[60vh] flex-col items-center justify-center py-20 text-center">
+      <div className="card w-full max-w-md p-10">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50">
+          <FaCheck className="text-emerald-600" />
         </div>
-        <h2 className="text-2xl font-extrabold text-gray-900 mb-2">Success!</h2>
-        <p className="text-gray-600 mb-6">{status}</p>
-        <p className="text-sm text-gray-400">Redirecting to your trips...</p>
+        <h1 className="mt-6 font-serif text-3xl font-semibold text-ink-900">Thank you.</h1>
+        <p className="mt-2 text-ink-500">{status}</p>
+        <p className="mt-6 text-sm text-ink-400">Redirecting to your trips…</p>
       </div>
     </div>
   );

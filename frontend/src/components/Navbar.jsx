@@ -1,10 +1,15 @@
-import { useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useContext, useEffect, useState } from 'react';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { FaBars, FaTimes } from 'react-icons/fa';
 import { AuthContext } from '../context/AuthContext';
 
 const Navbar = () => {
   const { user, logout, loading } = useContext(AuthContext);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => setOpen(false), [pathname]);
 
   const handleLogout = async () => {
     try {
@@ -15,77 +20,95 @@ const Navbar = () => {
     }
   };
 
+  const navItemClass = ({ isActive }) =>
+    `text-sm font-medium transition-colors duration-200 ${
+      isActive ? 'text-ink-900' : 'text-ink-500 hover:text-ink-900'
+    }`;
+
+  const mobileItemClass =
+    'rounded-lg px-3 py-2.5 text-sm font-medium text-ink-700 transition-colors hover:bg-ink-50';
+
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo Section */}
-          <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex items-center gap-2">
-              <span className="font-bold text-2xl tracking-tight text-slate-900">
-                Premium<span className="text-blue-600">Stays</span>
-              </span>
-            </Link>
-          </div>
+    <header className="sticky top-0 z-40 border-b border-ink-100/70 bg-brand-50/85 backdrop-blur-xl">
+      <nav className="container-page flex h-16 items-center justify-between lg:h-20">
+        <Link
+          to="/"
+          className="font-serif text-[1.65rem] font-semibold tracking-tight text-ink-900"
+        >
+          Premium<span className="text-brand-600">Stays</span>
+        </Link>
 
-          {/* Navigation Links */}
-          <div className="flex items-center space-x-6">
-            {!loading && (
-              user ? (
-                <>
-                  <span className="text-sm font-medium text-gray-500 hidden sm:block">
-                    Hello,
-                  </span>
-                  <Link
-                    to="/profile"
-                    className="text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors hidden sm:inline"
-                  >
-                    {user.name}
-                  </Link>
+        {/* Mobile toggle */}
+        <button
+          onClick={() => setOpen((v) => !v)}
+          aria-label="Toggle navigation menu"
+          aria-expanded={open}
+          className="rounded-lg border border-ink-200 p-2 text-ink-700 transition-colors hover:bg-white lg:hidden"
+        >
+          {open ? <FaTimes className="h-4 w-4" /> : <FaBars className="h-4 w-4" />}
+        </button>
 
-                  <Link 
-                    to="/my-bookings" 
-                    className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
-                  >
-                    My Trips
-                  </Link>
+        {/* Desktop nav */}
+        <div className="hidden items-center gap-8 lg:flex">
+          {loading ? null : user ? (
+            <>
+              <NavLink to="/my-bookings" className={navItemClass}>My trips</NavLink>
+              {user.role === 'host' && (
+                <NavLink to="/host/dashboard" className={navItemClass}>Host dashboard</NavLink>
+              )}
+              <span className="h-6 w-px bg-ink-100" />
+              <NavLink to="/profile" className="flex items-center gap-2.5 text-sm font-medium text-ink-600 transition-colors hover:text-ink-900">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-ink-900 text-xs font-semibold text-white">
+                  {(user.name || 'U').charAt(0).toUpperCase()}
+                </span>
+                {user.name}
+              </NavLink>
+              <button
+                onClick={handleLogout}
+                className="text-sm font-medium text-ink-500 transition-colors hover:text-ink-900"
+              >
+                Log out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="text-sm font-medium text-ink-600 transition-colors hover:text-ink-900"
+              >
+                Log in
+              </Link>
+              <Link to="/register" className="btn-primary !px-5 !py-2.5">Sign up</Link>
+            </>
+          )}
+        </div>
+      </nav>
 
-                  {user.role === 'host' && (
-                    <Link 
-                      to="/host/dashboard" 
-                      className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
-                    >
-                      Host Dashboard
-                    </Link>
-                  )}
-                  <button 
-                    onClick={handleLogout}
-                    className="text-sm font-medium text-red-600 hover:text-red-700 transition-colors"
-                  >
-                    Log out
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link 
-                    to="/login" 
-                    className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
-                  >
-                    Log in
-                  </Link>
-                  <Link 
-                    to="/register" 
-                    className="text-sm font-medium bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
-                  >
-                    Sign up
-                  </Link>
-                </>
-              )
+      {/* Mobile menu */}
+      {open && (
+        <div className="border-t border-ink-100 bg-white lg:hidden">
+          <div className="container-page flex flex-col gap-1 py-4">
+            {loading ? null : user ? (
+              <>
+                <Link to="/profile" className={mobileItemClass}>{user.name}</Link>
+                <Link to="/my-bookings" className={mobileItemClass}>My trips</Link>
+                {user.role === 'host' && (
+                  <Link to="/host/dashboard" className={mobileItemClass}>Host dashboard</Link>
+                )}
+                <button onClick={handleLogout} className={`${mobileItemClass} text-left text-ink-500`}>
+                  Log out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className={mobileItemClass}>Log in</Link>
+                <Link to="/register" className="btn-primary mt-2">Sign up</Link>
+              </>
             )}
           </div>
         </div>
-      </div>
-    </nav>
+      )}
+    </header>
   );
 };
 

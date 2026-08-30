@@ -4,6 +4,66 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900 antialiased;
+    @apply bg-brand-50 font-sans text-ink-800 antialiased;
+  }
+
+  ::selection {
+    @apply bg-brand-500/25 text-ink-900;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-500/60 ring-offset-2 ring-offset-brand-50;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.22em] text-brand-600;
+  }
+
+  .card {
+    @apply rounded-2xl border border-ink-100 bg-white shadow-soft;
+  }
+
+  .label {
+    @apply mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-500;
+  }
+
+  .input {
+    @apply w-full rounded-lg border border-ink-200 bg-white px-4 py-2.5 text-sm text-ink-800 shadow-soft transition-all duration-200 placeholder:text-ink-300 focus:border-brand-400;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-lg bg-ink-900 px-6 py-3 text-sm font-medium tracking-wide text-white transition-all duration-300 ease-out hover:-translate-y-px hover:bg-brand-600 active:translate-y-0 disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-lg border border-ink-200 bg-white px-6 py-3 text-sm font-medium tracking-wide text-ink-700 transition-all duration-300 hover:border-ink-300 hover:bg-ink-50;
+  }
+
+  .skeleton {
+    @apply animate-shimmer bg-ink-100;
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      rgb(255 255 255 / 0.65),
+      transparent
+    );
+    background-size: 400px 100%;
+    background-repeat: no-repeat;
   }
 }

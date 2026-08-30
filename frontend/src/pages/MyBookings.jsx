@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaCalendarAlt, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaArrowRight } from 'react-icons/fa';
 import api from '../services/api';
+
+const FALLBACK_IMAGE =
+  'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80';
 
 const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
@@ -19,22 +22,21 @@ const MyBookings = () => {
         setLoading(false);
       }
     };
-
     fetchMyBookings();
   }, []);
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short', day: 'numeric', year: 'numeric'
+  const formatDate = (dateString) =>
+    new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
     });
-  };
 
   const handleCancelBooking = async (bookingId) => {
     if (window.confirm('Are you sure you want to cancel this reservation? This cannot be undone.')) {
       try {
         await api.delete(`/bookings/${bookingId}`);
-        // Remove the deleted booking from the local state so the UI updates instantly
-        setBookings(bookings.filter(b => b._id !== bookingId));
+        setBookings((prev) => prev.filter((b) => b._id !== bookingId));
       } catch (err) {
         alert('Failed to cancel booking.');
       }
@@ -43,100 +45,118 @@ const MyBookings = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-ink-200 border-t-ink-800" />
       </div>
     );
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h1 className="text-3xl font-extrabold text-gray-900 mb-2">My Trips</h1>
-      <p className="text-gray-600 mb-8">View and manage your upcoming reservations.</p>
+    <div className="container-page max-w-5xl py-12 lg:py-16">
+      <p className="eyebrow">Your reservations</p>
+      <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight text-ink-900">
+        My trips
+      </h1>
 
-      {error && <div className="p-4 bg-red-50 text-red-700 rounded-lg mb-6">{error}</div>}
+      {error && (
+        <div className="mt-8 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
+          {error}
+        </div>
+      )}
 
-      {bookings.length === 0 && !error ? (
-        <div className="text-center py-20 bg-white border border-gray-200 rounded-xl shadow-sm">
-          <h2 className="text-xl font-bold text-gray-900 mb-2">No trips booked... yet!</h2>
-          <p className="text-gray-500 mb-6">Time to dust off your bags and start planning your next adventure.</p>
-          <Link to="/" className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
-            Start Searching
-          </Link>
+      {!error && bookings.length === 0 ? (
+        <div className="mt-10 flex flex-col items-center rounded-2xl border border-ink-100 bg-white px-6 py-20 text-center">
+          <h2 className="font-serif text-3xl font-semibold text-ink-900">No trips yet.</h2>
+          <p className="mt-2 max-w-sm text-ink-500">
+            Your upcoming reservations will appear here — start planning your next escape.
+          </p>
+          <Link to="/" className="btn-primary mt-8">Browse properties</Link>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="mt-10 space-y-6">
           {bookings.map((booking) => {
             const hotel = booking.hotel;
-            const imageUrl = hotel?.images?.length > 0 
-              ? hotel.images[0] 
-              : 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80';
-
+            const imageUrl = hotel?.images?.length > 0 ? hotel.images[0] : FALLBACK_IMAGE;
+            const cancelled = booking.status === 'cancelled';
             return (
-              <div key={booking._id} className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col md:flex-row hover:shadow-md transition-shadow">
-                <div className="w-full md:w-72 h-56 flex-shrink-0">
-                  <img 
-                    src={imageUrl} 
-                    alt={hotel?.name} 
-                    className="w-full h-full object-cover rounded-t-xl md:rounded-tr-none md:rounded-l-xl" 
+              <article
+                key={booking._id}
+                className="card flex flex-col overflow-hidden transition-all duration-300 ease-out hover:shadow-lift md:flex-row"
+              >
+                <div className="md:w-64 md:shrink-0">
+                  <img
+                    src={imageUrl}
+                    alt={hotel?.name}
+                    className="h-52 w-full object-cover md:h-full"
                   />
                 </div>
-                
-                <div className="p-6 md:w-2/3 flex flex-col justify-between">
-                  <div>
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="text-xl font-bold text-gray-900">
-                        {hotel?.name || 'Property Unavailable'}
-                      </h3>
-                      <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-bold uppercase rounded-full tracking-wide">
-                        {booking.status}
-                      </span>
-                    </div>
-                    
-                    {hotel && (
-                      <div className="flex items-center text-gray-500 text-sm mb-4">
-                        <FaMapMarkerAlt className="mr-2 text-gray-400" />
-                        {hotel.location.city}, {hotel.location.country}
-                      </div>
-                    )}
+                <div className="flex flex-1 flex-col p-6 lg:p-7">
+                  <div className="flex items-start justify-between gap-4">
+                    <h3 className="font-serif text-2xl font-semibold text-ink-900">
+                      {hotel?.name || 'Property unavailable'}
+                    </h3>
+                    <span
+                      className={`shrink-0 rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-wider ${
+                        cancelled
+                          ? 'border-ink-200 bg-ink-50 text-ink-500'
+                          : 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                      }`}
+                    >
+                      {booking.status}
+                    </span>
+                  </div>
 
-                    <div className="grid grid-cols-2 gap-4 mb-4 bg-gray-50 p-4 rounded-lg border border-gray-100">
-                      <div>
-                        <span className="block text-xs font-bold text-gray-500 uppercase mb-1 flex items-center">
-                          <FaCalendarAlt className="mr-2" /> Check-in
-                        </span>
-                        <span className="font-medium text-gray-900">{formatDate(booking.checkIn)}</span>
-                      </div>
-                      <div>
-                        <span className="block text-xs font-bold text-gray-500 uppercase mb-1 flex items-center">
-                          <FaCalendarAlt className="mr-2" /> Check-out
-                        </span>
-                        <span className="font-medium text-gray-900">{formatDate(booking.checkOut)}</span>
-                      </div>
+                  {hotel && (
+                    <p className="mt-1.5 flex items-center gap-2 text-sm text-ink-500">
+                      <FaMapMarkerAlt className="text-ink-400" />
+                      {hotel.location.city}, {hotel.location.country}
+                    </p>
+                  )}
+
+                  <div className="mt-5 grid grid-cols-2 gap-6">
+                    <div>
+                      <p className="label !mb-1">Check-in</p>
+                      <p className="text-sm font-medium text-ink-800">
+                        {formatDate(booking.checkIn)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="label !mb-1">Check-out</p>
+                      <p className="text-sm font-medium text-ink-800">
+                        {formatDate(booking.checkOut)}
+                      </p>
                     </div>
                   </div>
 
-                  <div className="flex justify-between items-end border-t border-gray-100 pt-4 mt-2">
-                     <div>
-                       <span className="block text-sm text-gray-500">Total Price</span>
-                       <span className="text-2xl font-extrabold text-blue-600">${booking.totalPrice}</span>
-                     </div>
-                     <div className="flex gap-4 items-center">
-                       <button
-                         onClick={() => handleCancelBooking(booking._id)}
-                         className="text-sm font-medium text-red-500 hover:text-red-700 transition-colors"
-                       >
-                         Cancel Trip
-                       </button>
-                       {hotel && (
-                         <Link to={`/hotels/${hotel._id}`} className="text-sm font-medium text-blue-600 hover:text-blue-800">
-                           View Property
-                         </Link>
-                       )}
-                     </div>
-                   </div>
+                  <div className="mt-6 flex items-end justify-between border-t border-ink-100 pt-5">
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-400">
+                        Total
+                      </p>
+                      <p className="font-serif text-2xl font-semibold text-ink-900">
+                        ${booking.totalPrice}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-6">
+                      {hotel && (
+                        <Link
+                          to={`/hotels/${hotel._id}`}
+                          className="inline-flex items-center gap-2 text-sm font-medium text-ink-600 transition-colors hover:text-ink-900"
+                        >
+                          View property <FaArrowRight className="text-xs" />
+                        </Link>
+                      )}
+                      <button
+                        onClick={() => handleCancelBooking(booking._id)}
+                        disabled={cancelled}
+                        className="text-sm font-medium text-red-500 transition-colors hover:text-red-700 disabled:pointer-events-none disabled:opacity-40"
+                      >
+                        {cancelled ? 'Cancelled' : 'Cancel trip'}
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              </article>
             );
           })}
         </div>
