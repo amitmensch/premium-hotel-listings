@@ -1,16 +1,15 @@
-# React + Vite
+# PremiumStays — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React 19 + Vite 8 SPA for the PremiumStays hotel booking platform.
 
-Currently, two official plugins are available:
+See the [repository README](../README.md) for full setup, environment variables, and scripts.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+cp .env.example .env   # set VITE_API_URL if needed
+npm run dev            # http://localhost:5173
+```
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+- **Design system** — brass/ink palette and component classes live in `src/index.css` with Tailwind tokens in `tailwind.config.js`.
+- **Pages** — `src/pages` (Home, HotelDetails, Login, Register, MyBookings, HostDashboard, EditHotel, Profile, PaymentSuccess).
+- **Routing** — `src/App.jsx`; SPA rewrites for Vercel are in `vercel.json`.
