@@ -33,9 +33,10 @@ const Navbar = () => {
       <nav className="container-page flex h-16 items-center justify-between lg:h-20">
         <Link
           to="/"
-          className="font-serif text-[1.65rem] font-semibold tracking-tight text-ink-900"
+          className="flex items-center gap-2 font-serif text-[1.65rem] font-semibold tracking-tight text-ink-900"
         >
-          Premium<span className="text-brand-600">Stays</span>
+          <img src="/favicon.svg" alt="PremiumStays Logo" className="h-8 w-8" />
+          <span>Premium<span className="text-brand-600">Stays</span></span>
         </Link>
 
         {/* Mobile toggle */}

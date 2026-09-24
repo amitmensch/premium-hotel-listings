@@ -44,9 +44,10 @@ const Footer = () => (
   <footer className="mt-20 border-t border-ink-100">
     <div className="container-page flex flex-col gap-8 py-10 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <p className="font-serif text-xl font-semibold text-ink-900">
-          Premium<span className="text-brand-600">Stays</span>
-        </p>
+        <div className="flex items-center gap-2 font-serif text-xl font-semibold text-ink-900">
+          <img src="/favicon.svg" alt="PremiumStays Logo" className="h-6 w-6" />
+          <span>Premium<span className="text-brand-600">Stays</span></span>
+        </div>
         <p className="mt-1 text-sm text-ink-400">
           Curated stays for the discerning traveller.
         </p>
